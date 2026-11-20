@@ -4,125 +4,44 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hidden Service</title>
-<!-- Das Script scripts/start-onion.ps1 trägt hier automatisch deine .onion-Adresse ein.
-     Der Tor Browser zeigt dann bei der GitHub-Seite "Onion verfügbar" an. -->
+<!-- Wird von scripts/start-onion.ps1 automatisch mit deiner .onion-Adresse befüllt. -->
 <meta http-equiv="onion-location" content="http://lvwzim3wuiqtlziawv36xsnfjfbo3rrezypl366fpsy65besnyddg6ad.onion/">
 <style>
-  :root {
-    --bg: #07060b;
-    --panel: #0e0c16;
-    --line: #2a2340;
-    --text: #cfc9e2;
-    --dim: #7b7596;
-    --onion: #a566d6;
-    --ok: #6fe3a1;
-    --warn: #e3b86f;
-  }
+  :root { --bg: #07060b; --text: #cfc9e2; --onion: #a566d6; }
   * { box-sizing: border-box; }
-  html { background: var(--bg); }
+  html, body { height: 100%; margin: 0; }
   body {
-    margin: 0;
+    display: grid; place-items: center; text-align: center;
+    background: radial-gradient(ellipse at 50% 0%, #1b1030 0%, transparent 65%), var(--bg);
     color: var(--text);
-    font: 16px/1.65 "Cascadia Mono", Consolas, "Courier New", monospace;
-    min-height: 100vh;
-    background:
-      radial-gradient(ellipse at 50% -10%, #1b1030 0%, transparent 60%),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px),
-      var(--bg);
+    font: 16px/1.6 "Cascadia Mono", Consolas, "Courier New", monospace;
   }
-  main { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
-  a { color: var(--onion); }
-  a:focus-visible { outline: 2px solid var(--onion); outline-offset: 3px; }
-
-  #boot { margin: 0 0 40px; color: var(--dim); min-height: 7.5em; white-space: pre-wrap; }
-  #boot .ok { color: var(--ok); }
-
   h1 {
-    margin: 0 0 8px;
-    font-size: clamp(2rem, 7vw, 3.4rem);
-    font-weight: 700;
-    letter-spacing: .02em;
-    color: #fff;
-    text-shadow: 0 0 18px rgba(165,102,214,.55);
+    margin: 0; font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 700;
+    letter-spacing: .04em; color: #fff; text-shadow: 0 0 18px rgba(165,102,214,.55);
   }
-  .sub { margin: 0 0 40px; color: var(--dim); }
-
-  section { border: 1px solid var(--line); background: var(--panel); padding: 20px 22px; margin: 0 0 20px; }
-  h2 { margin: 0 0 10px; font-size: 1rem; font-weight: 700; color: var(--onion); }
-  p { margin: 0 0 10px; max-width: 70ch; }
-  p:last-child { margin-bottom: 0; }
-
-  #conn { display: flex; gap: 10px; align-items: baseline; }
-  #conn .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--warn); flex: none; transform: translateY(-1px); }
-  #conn.tor .dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
-
-  footer { color: var(--dim); font-size: .85rem; margin-top: 32px; }
-  .cursor { display: inline-block; width: .6em; height: 1em; background: var(--onion); vertical-align: -2px; animation: blink 1.1s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+  #enter { margin-top: 32px; }
+  #enter a {
+    display: inline-block; padding: 10px 28px; color: var(--text); text-decoration: none;
+    border: 1px solid var(--onion); transition: background .15s, box-shadow .15s;
+  }
+  #enter a:hover { background: rgba(165,102,214,.15); box-shadow: 0 0 14px rgba(165,102,214,.4); }
+  #enter a:focus-visible { outline: 2px solid var(--onion); outline-offset: 3px; }
 </style>
 </head>
 <body>
 <main>
-  <pre id="boot" aria-hidden="true"></pre>
-
   <h1>Hidden Service</h1>
-  <p class="sub">Eine kleine Seite im Tor-Netzwerk.</p>
-
-  <section>
-    <h2>Verbindung</h2>
-    <p id="conn"><span class="dot"></span><span id="connText">Prüfe Verbindung …</span></p>
-  </section>
-
-  <section>
-    <h2>Über diese Seite</h2>
-    <p>Hier kommt dein Inhalt hin. Diese Seite lädt keine externen Skripte, Schriften oder Bilder, damit beim Besuch über Tor nichts nach außen verraten wird.</p>
-  </section>
-
-  <section>
-    <h2>Kontakt</h2>
-    <p>Trag hier ein, wie man dich erreicht, zum Beispiel eine Mailadresse oder einen PGP-Schlüssel.</p>
-  </section>
-
-  <footer>Kein Tracking. Keine Cookies. <span class="cursor"></span></footer>
+  <div id="enter"></div>
 </main>
-
 <script>
-(function () {
-  var meta = document.querySelector('meta[http-equiv="onion-location"]');
-  var onionUrl = meta ? meta.content : "";
-  var ready = onionUrl && onionUrl.indexOf("DEINE-ONION") === -1;
-  var isOnion = location.hostname.slice(-6) === ".onion";
-
-  // Verbindungsstatus (zeigt bewusst keine Onion-Adresse an)
-  var conn = document.getElementById("conn");
-  var text = document.getElementById("connText");
-  if (isOnion) {
-    conn.classList.add("tor");
-    text.textContent = "Du bist über das Tor-Netzwerk verbunden.";
-  } else if (ready) {
-    text.textContent = "Du nutzt das normale Internet. Im Tor Browser erscheint oben in der Adressleiste „Onion verfügbar“.";
-  } else {
-    text.textContent = "Du nutzt das normale Internet.";
+  // Der Button erscheint nur im Tor-Netzwerk, im normalen Internet bleibt die Seite leer.
+  if (location.hostname.slice(-6) === ".onion") {
+    var a = document.createElement("a");
+    a.href = "tutorial/index.html";
+    a.textContent = "Enter site";
+    document.getElementById("enter").appendChild(a);
   }
-
-  // Boot-Sequenz, einmal beim Laden
-  var lines = [
-    "> verbinde mit Tor-Netzwerk …",
-    "> baue Circuit auf (3 Hops) …",
-    "> Rendezvous-Punkt gefunden",
-    "> Hidden Service erreichbar"
-  ];
-  var boot = document.getElementById("boot");
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce) { boot.textContent = lines.join("\n"); return; }
-  var i = 0;
-  (function next() {
-    if (i >= lines.length) return;
-    boot.textContent += (i ? "\n" : "") + lines[i++];
-    setTimeout(next, 450);
-  })();
-})();
 </script>
 </body>
 </html>
